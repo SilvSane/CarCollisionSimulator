@@ -1,0 +1,32 @@
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+indent_style = space
+
+# C# 
+[*.cs]
+indent_size = 4
+tab_width = 4
+max_line_length = 120
+
+
+csharp_indent_case_contents = true
+csharp_indent_switch_labels = true
+csharp_new_line_before_open_brace = all
+
+# JS
+[*.{js,json,mjs,ts,html,css}]
+indent_size = 2
+tab_width = 2
+
+
+[*.md]
+trim_trailing_whitespace = false
+
+
+[*.{csproj,sln,props,targets}]
+indent_size = 2
