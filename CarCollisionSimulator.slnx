@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="Controller/Controller.csproj" />
+  <Project Path="Core/Core.csproj" />
+</Solution>
