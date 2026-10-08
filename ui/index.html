@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Симулятор встречного движения</title>
+<link rel="stylesheet" href="css/style.css">
+<script src="https://cdn.jsdelivr.net/npm/p5@1.9.0/lib/p5.min.js"></script>
+<script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+
+
+</head>
+
+<body>
+
+
+<h1>Симулятор встречного движения</h1>
+
+
+<section class="panel">
+    <h2>Параметры</h2>
+
+    <div class="row">
+
+        <div class="col">
+
+            <label
+                for="left-equation"
+            >
+                Уравнение левой машины
+            </label>
+
+            <input
+                id="left-equation"
+                type="text"
+                placeholder="Например: 2*t + 0.2*t*t"
+                autocomplete="off"
+            >
+
+        </div>
+
+
+        <div class="col">
+
+            <label
+                for="right-equation"
+            >
+                Уравнение правой машины
+            </label>
+
+            <input
+                id="right-equation"
+                type="text"
+                placeholder="Например: 10 - 3*t"
+                autocomplete="off"
+            >
+
+
+        </div>
+
+    </div>
+
+
+    <div class="row">
+
+        <label
+            for="dt-select"
+        >
+            Точность:
+        </label>
+
+        <select id="dt-select">
+            <option value="1.0">
+                Ориентировочная (шаг ~1 с)
+            </option>
+
+            <option value="0.05" selected>
+                Стандартная (шаг ~50 мс)
+            </option>
+
+            <option value="0.005">
+                Повышенная (шаг ~5 мс)
+            </option>
+        </select>
+
+    </div>
+
+
+    <div class="row">
+
+        <button
+            id="check-button"
+            disabled
+        >
+            Проверить уравнения
+        </button>
+
+        <button
+            id="start-button"
+            disabled
+        >
+            Старт
+        </button>
+
+    </div>
+
+</section>
+</body>
+</html>
