@@ -18,15 +18,15 @@ namespace Core.Physics
 
     public class Negate : Expr
     {
-        public Expr Operand { get; }
+        public Expr Inner;
 
-        public Negate(Expr operand)
+        public Negate(Expr inner)
         {
-            Operand = operand;
+            Inner = inner;
         }
         public override double Eval(double t)
         {
-            return -Operand.Eval(t);
+            return -Inner.Eval(t);
         }
         
     }
