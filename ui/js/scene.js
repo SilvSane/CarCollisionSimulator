@@ -50,7 +50,7 @@ function initScene(containerId = "scene") {
         margin +
         ((x - worldMin) / (worldMax - worldMin)) * (p.width - margin * 2);
 
-      const carWidthPx = 66;
+      const carWidthPx = Math.abs(worldToScreen(1) - worldToScreen(0));
 
       p.noStroke();
       p.fill(90);
