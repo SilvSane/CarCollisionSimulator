@@ -41,7 +41,7 @@ async function apiRun(params) {
       right: 10.0
     },
     carWidth: 1.0,
-    dt: 0.05
+    dt: params.dt
   };
 
   console.log("Запрос на запуск симуляции:", requestBody);

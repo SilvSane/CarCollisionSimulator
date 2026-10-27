@@ -4,6 +4,7 @@ const el = {
   checkButton: document.getElementById("check-button"),
   startButton: document.getElementById("start-button"),  
   message: document.getElementById("message"),
+  dtSelect: document.getElementById("dt-select")
 };
 
 function updateCheckButtonState() {
@@ -29,7 +30,8 @@ el.checkButton.addEventListener("click", async function () {
     equations: {
       left: el.leftEquation.value,
       right: el.rightEquation.value
-    }
+    },
+    dt: Number(el.dtSelect.value)
   };
 
   try {
@@ -74,7 +76,8 @@ el.startButton.addEventListener("click", async function () {
     equations: {
       left: el.leftEquation.value,
       right: el.rightEquation.value
-    }
+    },
+    dt: Number(el.dtSelect.value)
   };
 
   try {
@@ -85,7 +88,7 @@ el.startButton.addEventListener("click", async function () {
     
     showStatistics(result.statistics);
 
-animateScene(result.samples, result.meta.dt, result.statistics.collisionTime );
+    animateScene(result.samples, result.meta.dt, result.statistics.collisionTime );
     drawPositionGraph(result.samples);
 
   } catch (error) {
