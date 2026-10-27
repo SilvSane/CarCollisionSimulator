@@ -82,15 +82,7 @@ el.startButton.addEventListener("click", async function () {
 
     const result = await apiRun(params);
 
-    console.log("Результат симуляции:", result);
-    console.log(
-  "Последняя точка:",
-  result.samples[result.samples.length - 1]
-);
-console.log("Ширина машины:", result.meta.carWidth);
-    console.log("Первая точка:", result.samples[0]);
-    console.log("Вторая точка:", result.samples[1]);
-    console.log("Параметры сцены:", result.meta);
+
     animateScene(result.samples, result.meta.dt);
 
 
