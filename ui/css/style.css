@@ -1,4 +1,27 @@
+body {
+    font-family: Arial, sans-serif;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 10px;
+}
+
+.row {
+    margin-bottom: 10px;
+}
+
+.col {
+    display: inline-block;
+    width: 48%;
+}
+
+input[type="text"] {
+    width: 95%;
+}
 
 input[type="text"].invalid {
     border-color: red;
+}
+
+#timeline-seek {
+    width: 300px;
 }
