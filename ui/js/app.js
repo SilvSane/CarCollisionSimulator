@@ -2,6 +2,7 @@ const el = {
   leftEquation: document.getElementById("left-equation"),
   rightEquation: document.getElementById("right-equation"),
   checkButton: document.getElementById("check-button"),
+  startButton: document.getElementById("start-button"),  
   message: document.getElementById("message"),
 };
 
@@ -10,6 +11,7 @@ function updateCheckButtonState() {
   const rightFilled = el.rightEquation.value.trim() !== "";
 
   el.checkButton.disabled = !(leftFilled && rightFilled);
+  el.startButton.disabled = true;
 }
 
 el.leftEquation.addEventListener("input", updateCheckButtonState);
@@ -41,6 +43,7 @@ el.checkButton.addEventListener("click", async function () {
         .join(" ");
       return;
     }
+    el.startButton.disabled = false;
 
     const leftDirection =
       result.directions.left === "right" ? "вправо" : "влево";
@@ -66,4 +69,40 @@ el.checkButton.addEventListener("click", async function () {
   }
 });
 
+el.startButton.addEventListener("click", async function () {
+  const params = {
+    equations: {
+      left: el.leftEquation.value,
+      right: el.rightEquation.value
+    }
+  };
+
+  try {
+    el.message.textContent = "Выполняется симуляция...";
+
+    const result = await apiRun(params);
+
+    console.log("Результат симуляции:", result);
+    console.log(
+  "Последняя точка:",
+  result.samples[result.samples.length - 1]
+);
+console.log("Ширина машины:", result.meta.carWidth);
+    console.log("Первая точка:", result.samples[0]);
+    console.log("Вторая точка:", result.samples[1]);
+    console.log("Параметры сцены:", result.meta);
+    animateScene(result.samples, result.meta.dt);
+
+
+    el.message.textContent =
+      `Симуляция завершена. Время столкновения: ${
+        result.statistics.collisionTime
+      } с.`;
+  } catch (error) {
+    console.error("Ошибка запуска симуляции:", error);
+    el.message.textContent = "Не удалось выполнить симуляцию.";
+  }
+});
+
 updateCheckButtonState();
+initScene();
