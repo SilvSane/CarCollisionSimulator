@@ -38,6 +38,7 @@
                 type="text"
                 placeholder="Например: 2*t + 0.2*t*t"
                 autocomplete="off"
+                value="2*t + 0.2*t*t"
             >
 
         </div>
@@ -56,6 +57,7 @@
                 type="text"
                 placeholder="Например: 10 - 3*t"
                 autocomplete="off"
+                value="10 - 3*t"
             >
 
 
@@ -85,6 +87,36 @@
                 Повышенная (шаг ~5 мс)
             </option>
         </select>
+        <div class="row">
+
+    <label for="animation-speed">
+        Скорость воспроизведения:
+    </label>
+
+    <select id="animation-speed">
+        
+        <option value="500">
+            Очень медленная
+        </option>
+
+        <option value="200" selected>
+            Медленная
+        </option>        
+        
+        <option value="100" selected>
+            Обычная
+        </option>
+
+        <option value="50">
+            Быстрая
+        </option>
+
+        <option value="10">
+            Очень быстрая
+        </option>
+    </select>
+
+</div>
 
     </div>
 

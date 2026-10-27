@@ -4,7 +4,8 @@ const el = {
   checkButton: document.getElementById("check-button"),
   startButton: document.getElementById("start-button"),  
   message: document.getElementById("message"),
-  dtSelect: document.getElementById("dt-select")
+  dtSelect: document.getElementById("dt-select"),
+  animationSpeed: document.getElementById("animation-speed")
 };
 
 function updateCheckButtonState() {
@@ -89,7 +90,7 @@ el.startButton.addEventListener("click", async function () {
     
     showStatistics(result.statistics);
 
-    animateScene(result.samples, result.meta.dt, result.statistics.collisionTime );
+    animateScene(result.samples, result.meta.dt, Number(el.animationSpeed.value));
     drawPositionGraph(result.samples);
 
   } catch (error) {
