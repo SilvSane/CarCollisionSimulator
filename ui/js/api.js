@@ -29,7 +29,23 @@ async function apiCheck(params) {
 
 
 
+
 async function apiRun(params) {
+  const requestBody = {
+    equations: {
+      left: params.equations.left,
+      right: params.equations.right
+    },
+    initialPositions: {
+      left: 0.0,
+      right: 10.0
+    },
+    carWidth: 1.0,
+    dt: 0.05
+  };
+
+  console.log("Запрос на запуск симуляции:", requestBody);
+
   const response = await fetch(
     "http://localhost:5000/api/simulate/run",
     {
@@ -37,20 +53,15 @@ async function apiRun(params) {
       headers: {
         "Content-Type": "application/json"
       },
-      body: JSON.stringify({
-        ...params,
-        initialPositions: {
-          left: 0,
-          right: 10
-        },
-        carWidth: 1
-      })
+      body: JSON.stringify(requestBody)
     }
   );
 
   if (!response.ok) {
+    const errorText = await response.text();
+
     throw new Error(
-      `Ошибка запуска симуляции: HTTP ${response.status}`
+      `Ошибка запуска симуляции: HTTP ${response.status}. ${errorText}`
     );
   }
 
