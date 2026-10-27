@@ -189,7 +189,7 @@ function startAnimationTimer() {
 
 function seekAnimation(fraction) {
   if (animationSamples.length === 0) return;
-  
+
   // Немедленно останавливаем воспроизведение при перемотке.
   animationPlaying = false;
   stopAnimationTimer();
@@ -276,7 +276,7 @@ function toggleAnimationPlayback() {
   startAnimationTimer();
 }
 
-function animateScene(samples, dt = 0.05) {
+function animateScene(samples, dt = 0.05, animationSpeedMs = 100) {
   if (!sceneSketch || !samples || samples.length === 0) return;
 
   stopAnimationTimer();
@@ -284,7 +284,7 @@ function animateScene(samples, dt = 0.05) {
   animationSamples = samples;
   animationIndex = 0;
   animationPlaying = true;
-  animationStepMs = Math.max(1, dt * 1000);
+  animationStepMs = animationSpeedMs;
   animationStartTime = samples[0].t;
   animationDuration =
     samples[samples.length - 1].t - animationStartTime;
