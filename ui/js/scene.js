@@ -119,7 +119,7 @@ function updateScene(sample) {
   }
 }
 
-function animateScene(samples, dt = 0.05) {
+function animateScene(samples, dt = 0.05, onComplete) {
   if (!sceneSketch || !samples || samples.length === 0) return;
 
   if (sceneAnimationId !== null) {
@@ -136,6 +136,7 @@ function animateScene(samples, dt = 0.05) {
     if (index >= samples.length) {
       clearInterval(sceneAnimationId);
       sceneAnimationId = null;
+      onComplete?.();
       return;
     }
 

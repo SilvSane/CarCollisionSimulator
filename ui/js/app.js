@@ -84,14 +84,11 @@ el.startButton.addEventListener("click", async function () {
     const result = await apiRun(params);
     
     showStatistics(result.statistics);
+    animateScene(result.samples, result.meta.dt, () => {
+  el.message.textContent = "Симуляция завершена.";
+});
+    drawPositionGraph(result.samples);
 
-    animateScene(result.samples, result.meta.dt);
-
-
- /*   el.message.textContent =
-      `Симуляция завершена. Время столкновения: ${
-        result.statistics.collisionTime
-      } с.`; */
   } catch (error) {
     console.error("Ошибка запуска симуляции:", error);
     el.message.textContent = "Не удалось выполнить симуляцию.";
