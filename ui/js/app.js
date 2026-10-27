@@ -84,9 +84,8 @@ el.startButton.addEventListener("click", async function () {
     const result = await apiRun(params);
     
     showStatistics(result.statistics);
-    animateScene(result.samples, result.meta.dt, () => {
-  el.message.textContent = "Симуляция завершена.";
-});
+
+animateScene(result.samples, result.meta.dt, result.statistics.collisionTime );
     drawPositionGraph(result.samples);
 
   } catch (error) {

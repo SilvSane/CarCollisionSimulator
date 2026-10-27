@@ -107,39 +107,191 @@ function drawCar(p, x, y, label, color, carWidthPx) {
 }
 
 
+
 let sceneAnimationId = null;
+let animationSamples = [];
+let animationIndex = 0;
+let animationPlaying = false;
+let animationStepMs = 50;
+let animationStartTime = 0;
+let animationDuration = 0;
 
 function updateScene(sample) {
   if (!sceneSketch || !sample) return;
 
   sceneSketch.setCarPositions(sample.left, sample.right);
+}
 
-  if (simulationTimeElement) {
-    simulationTimeElement.textContent = `Время: ${sample.t.toFixed(3)} с`;
+function renderAnimationFrame(index) {
+  if (animationSamples.length === 0) return;
+
+  animationIndex = Math.max(
+    0,
+    Math.min(index, animationSamples.length - 1)
+  );
+
+  const sample = animationSamples[animationIndex];
+
+  updateScene(sample);
+
+  updateTimeline(
+    sample.t - animationStartTime,
+    animationDuration,
+    animationPlaying
+  );
+}
+
+function stopAnimationTimer() {
+  if (sceneAnimationId !== null) {
+    clearInterval(sceneAnimationId);
+    sceneAnimationId = null;
   }
 }
 
-function animateScene(samples, dt = 0.05, onComplete) {
-  if (!sceneSketch || !samples || samples.length === 0) return;
+function startAnimationTimer() {
+  stopAnimationTimer();
 
-  if (sceneAnimationId !== null) {
-    clearInterval(sceneAnimationId);
+  if (
+    !animationPlaying ||
+    animationSamples.length < 2 ||
+    animationIndex >= animationSamples.length - 1
+  ) {
+    animationPlaying = false;
+    updateTimeline(
+      animationSamples[animationIndex]?.t - animationStartTime || 0,
+      animationDuration,
+      false
+    );
+    return;
   }
 
-  let index = 0;
-
-  updateScene(samples[index]);
-
   sceneAnimationId = setInterval(() => {
-    index++;
+    animationIndex++;
 
-    if (index >= samples.length) {
-      clearInterval(sceneAnimationId);
-      sceneAnimationId = null;
-      onComplete?.();
+    if (animationIndex >= animationSamples.length - 1) {
+      animationIndex = animationSamples.length - 1;
+      animationPlaying = false;
+      stopAnimationTimer();
+      renderAnimationFrame(animationIndex);
       return;
     }
 
-    updateScene(samples[index]);
-  }, dt * 1000);
+    renderAnimationFrame(animationIndex);
+  }, animationStepMs);
 }
+
+
+function seekAnimation(fraction) {
+  if (animationSamples.length === 0) return;
+
+  // Немедленно останавливаем воспроизведение при перемотке.
+  animationPlaying = false;
+  stopAnimationTimer();
+
+  const targetTime =
+    animationStartTime +
+    Math.max(0, Math.min(1, fraction)) * animationDuration;
+
+  let index = 0;
+
+  while (
+    index < animationSamples.length - 1 &&
+    animationSamples[index + 1].t < targetTime
+  ) {
+    index++;
+  }
+
+  if (
+    index < animationSamples.length - 1 &&
+    targetTime > animationSamples[index].t
+  ) {
+    const first = animationSamples[index];
+    const second = animationSamples[index + 1];
+
+    const span = second.t - first.t;
+    const ratio = span > 0
+      ? (targetTime - first.t) / span
+      : 0;
+
+    updateScene({
+      t: targetTime,
+      left: first.left + (second.left - first.left) * ratio,
+      right: first.right + (second.right - first.right) * ratio
+    });
+
+    animationIndex = index;
+
+    updateTimeline(
+      targetTime - animationStartTime,
+      animationDuration,
+      false
+    );
+
+    return;
+  }
+
+  renderAnimationFrame(index);
+  updateTimeline(
+    targetTime - animationStartTime,
+    animationDuration,
+    false
+  );
+}
+
+
+function toggleAnimationPlayback() {
+  if (animationSamples.length === 0) return;
+
+  if (animationPlaying) {
+    animationPlaying = false;
+    stopAnimationTimer();
+
+    updateTimeline(
+      animationSamples[animationIndex].t - animationStartTime,
+      animationDuration,
+      false
+    );
+
+    return;
+  }
+
+  if (animationIndex >= animationSamples.length - 1) {
+    animationIndex = 0;
+    renderAnimationFrame(0);
+  }
+
+  animationPlaying = true;
+  updateTimeline(
+    animationSamples[animationIndex].t - animationStartTime,
+    animationDuration,
+    true
+  );
+
+  startAnimationTimer();
+}
+
+function animateScene(samples, dt = 0.05) {
+  if (!sceneSketch || !samples || samples.length === 0) return;
+
+  stopAnimationTimer();
+
+  animationSamples = samples;
+  animationIndex = 0;
+  animationPlaying = true;
+  animationStepMs = Math.max(1, dt * 1000);
+  animationStartTime = samples[0].t;
+  animationDuration =
+    samples[samples.length - 1].t - animationStartTime;
+
+  initTimeline();
+
+  configureTimeline(
+    animationDuration,
+    seekAnimation,
+    toggleAnimationPlayback
+  );
+
+  renderAnimationFrame(0);
+  startAnimationTimer();
+}
+
