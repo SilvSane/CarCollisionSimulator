@@ -60,7 +60,8 @@ el.checkButton.addEventListener("click", async function () {
     if (result.willCollide) {
       el.message.textContent =
         `${directionsMessage} Столкновение возможно. ` +
-        `Предполагаемое время: ${result.predictedCollisionTime} с.`;
+        `Предполагаемое время: ${result.predictedCollisionTime != null
+          ? Number(result.predictedCollisionTime).toFixed(2): "—"} с.`;
     } else {
       el.message.textContent =
         `${directionsMessage} Столкновение не ожидается.`;
