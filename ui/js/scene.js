@@ -1,5 +1,6 @@
 
 let sceneSketch = null;
+let simulationTimeElement = null;
 
 function initScene(containerId = "scene") {
   const container = document.getElementById(containerId);
@@ -8,6 +9,7 @@ function initScene(containerId = "scene") {
     console.error(`Контейнер сцены #${containerId} не найден`);
     return;
   }
+    simulationTimeElement = document.getElementById("simulation-time");
 
   if (sceneSketch) {
     sceneSketch.remove();
@@ -81,21 +83,13 @@ function initScene(containerId = "scene") {
 function drawCar(p, x, y, label, color, carWidthPx) {
   p.rectMode(p.CENTER);
   p.noStroke();
-
-  // Кузов
   p.fill(color);
   p.rect(x, y, carWidthPx, 28, 6);
-
-  // Кабина и окна
   p.fill(210, 230, 245);
   p.rect(x, y - 5, carWidthPx * 0.48, 14, 4);
-
-  // Колёса
   p.fill(35);
   p.ellipse(x - carWidthPx * 0.3, y + 13, 14, 14);
   p.ellipse(x + carWidthPx * 0.3, y + 13, 14, 14);
-
-  // Подпись
   p.fill(30);
   p.textAlign(p.CENTER);
   p.textSize(12);
@@ -119,6 +113,10 @@ function updateScene(sample) {
   if (!sceneSketch || !sample) return;
 
   sceneSketch.setCarPositions(sample.left, sample.right);
+
+  if (simulationTimeElement) {
+    simulationTimeElement.textContent = `Время: ${sample.t.toFixed(3)} с`;
+  }
 }
 
 function animateScene(samples, dt = 0.05) {
