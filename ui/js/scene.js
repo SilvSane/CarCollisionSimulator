@@ -19,6 +19,8 @@ function initScene(containerId = "scene") {
     const roadY = 0.6;
     let leftPosition = null;
     let rightPosition = null;
+    let worldMin = -4;
+    let worldMax = 14;
 
     p.setup = () => {
       const width = container.clientWidth || 600;
@@ -34,6 +36,10 @@ function initScene(containerId = "scene") {
           leftPosition = left;
           rightPosition = right;
       };
+      p.setWorldBounds = (min, max) => {
+        worldMin = min;
+        worldMax = max;
+      };
 
     p.draw = () => {
         if (leftPosition === null || rightPosition === null) {
@@ -42,13 +48,13 @@ function initScene(containerId = "scene") {
       p.background(245);
 
       const roadYpx = p.height * roadY;
-      const margin = 45;
-      const worldMin = -4;
-      const worldMax = 14;
+
+      const margin = 70;
 
       const worldToScreen = (x) =>
         margin +
         ((x - worldMin) / (worldMax - worldMin)) * (p.width - margin * 2);
+
 
       const carWidthPx = Math.abs(worldToScreen(1) - worldToScreen(0));
 
@@ -183,7 +189,7 @@ function startAnimationTimer() {
 
 function seekAnimation(fraction) {
   if (animationSamples.length === 0) return;
-
+  
   // Немедленно останавливаем воспроизведение при перемотке.
   animationPlaying = false;
   stopAnimationTimer();
@@ -282,6 +288,20 @@ function animateScene(samples, dt = 0.05) {
   animationStartTime = samples[0].t;
   animationDuration =
     samples[samples.length - 1].t - animationStartTime;
+  const allPositions = samples.flatMap(sample => [
+    sample.left,
+    sample.right
+  ]);
+
+  const minPosition = Math.min(...allPositions);
+  const maxPosition = Math.max(...allPositions);
+
+  const padding = Math.max((maxPosition - minPosition) * 0.1, 2);
+
+  sceneSketch.setWorldBounds(
+    minPosition - padding,
+    maxPosition + padding
+  );
 
   initTimeline();
 
