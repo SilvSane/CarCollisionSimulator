@@ -1,0 +1,8 @@
+POST http://localhost:5075/api/simulate/check
+Content-Type: application/json
+
+{
+  "equations": { "left": "2*t", "right": "10 - 3*t" },
+  "initialPositions": { "left": 0, "right": 10 },
+  "carWidth": 1
+}
