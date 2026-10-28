@@ -53,16 +53,50 @@ namespace Core.Physics
     {
         private readonly EquationParser _parser = new EquationParser();
 
+        private void ValidateInput(SimInput input)
+        {
+            if (input.Dt <= 0) throw new Exception("Шаг времени больше нуля надо");
+            if (input.CarWidth <= 0) throw new Exception("Ширина машины больше нуля надо");
+            if (input.LeftStart <= 0) throw new Exception("Левая машина должна быть левее правой");
+            if (string.IsNullOrWhiteSpace(input.LeftEquation) || string.IsNullOrWhiteSpace(input.RightEquation)) throw new Exception("Уравнение не пустое должно быть"); 
+
+        }
+
         //Проверка уравнений  
         public CheckResult Check(string leftEq, string rightEq,
                                  double leftStart, double rightStart, double carWidth)
         {
             var result = new CheckResult();
 
-            Expr leftExpr, rightExpr;
+            var tempInput = new SimInput
+            {
+                LeftEquation = leftEq,
+                RightEquation = rightEq,
+                LeftStart = leftStart,
+                RightStart = rightStart,
+                CarWidth = carWidth,
+                Dt = 0.1    
+            };
 
             // Пытаемся разобрать левое    
-            try { leftExpr = _parser.Parser(leftEq); }
+            try
+            {
+                ValidateInput(tempInput);
+            }
+            catch (Exception ex)
+            {
+                result.ErrorMessage = ex.Message;
+                result.LeftDirection = "unknown";
+                result.RightDirection = "unknown";
+                return result;
+            }
+            Expr leftExpr, rightExpr;
+
+            // Пытаемся разобрать правое    
+            try
+            {
+                leftExpr = _parser.Parser(leftEq);
+            }
             catch (Exception ex)
             {
                 result.ErrorMessage = "Ошибка в левом уравнении: " + ex.Message;
@@ -71,7 +105,7 @@ namespace Core.Physics
                 return result;
             }
 
-            // Пытаемся разобрать правое    
+
             try { rightExpr = _parser.Parser(rightEq); }
             catch (Exception ex)
             {
@@ -81,9 +115,10 @@ namespace Core.Physics
                 return result;
             }
 
-            // Определяем направление     
+
             result.LeftDirection = DetermineDirection(leftExpr);
             result.RightDirection = DetermineDirection(rightExpr);
+
 
             if (result.LeftDirection == "unknown" || result.RightDirection == "unknown")
             {
@@ -97,7 +132,7 @@ namespace Core.Physics
                 return result;
             }
 
-
+            // Ищем столкновение   
             double collision = FindCollision(leftExpr, rightExpr, leftStart, rightStart, carWidth, 0.001);
 
             if (collision < 0)
@@ -107,17 +142,11 @@ namespace Core.Physics
             }
 
 
-            /*return new CheckResult
-            {
-                IsValid = true,
-                WillCollide = true,
-                PredictedCollisionTime = collision,
-                ErrorMessage = ""
-            };*/
+
 
             result.IsValid = true;
             result.WillCollide = true;
-            result.PredictedCollisionTime = collision;
+            result.PredictedCollisionTime = Math.Round(collision, 4);  
             result.ErrorMessage = "";
             return result;
 
@@ -126,6 +155,8 @@ namespace Core.Physics
 
         public SimResult Run(SimInput input)
         {
+            ValidateInput(input);
+
             var leftExpr = _parser.Parser(input.LeftEquation);
             var rightExpr = _parser.Parser(input.RightEquation);
 
@@ -141,42 +172,44 @@ namespace Core.Physics
             var samples = new List<SimSample>();
             for (double t = 0; t < collisionTime; t += input.Dt)
             {
+                if (samples.Count > 100000) throw new Exception("Слишком много всего ");
+
                 samples.Add(new SimSample
                 {
-                    T = t,
-                    Left = input.LeftStart + leftExpr.Eval(t),
-                    Right = input.RightStart + rightExpr.Eval(t)
+                    T = Math.Round(t,4),
+                    Left = Math.Round(leftExpr.Eval(t),4),
+                    Right = Math.Round(rightExpr.Eval(t),4)
                 });
             }
 
 
             samples.Add(new SimSample
             {
-                T = collisionTime,
-                Left = input.LeftStart + leftExpr.Eval(collisionTime),
-                Right = input.RightStart + rightExpr.Eval(collisionTime)
+                T = Math.Round(collisionTime,4),
+                Left = Math.Round(leftExpr.Eval(collisionTime),4),
+                Right = Math.Round(rightExpr.Eval(collisionTime),4)
             });
 
             var last = samples[samples.Count - 1];
 
-            double leftDistance = Math.Abs(last.Left - input.LeftStart);
-            double rightDistance = Math.Abs(input.RightStart - last.Right);
+            double leftDistance = Math.Abs(last.Left -leftExpr.Eval(0));
+            double rightDistance = Math.Abs(rightExpr.Eval(0) - last.Right);
             double duration = last.T;
 
             return new SimResult
             {
                 Dt = input.Dt,
-                CollisionTime = collisionTime,
+                CollisionTime = Math.Round(collisionTime,4),
                 CarWidth = input.CarWidth,
-                LeftStart = input.LeftStart,
-                RightStart = input.RightStart,
+                LeftStart = Math.Round(leftExpr.Eval(0), 4),
+                RightStart = Math.Round(rightExpr.Eval(0), 4),
                 Samples = samples,
-                Duration = duration,
-                LeftAvgSpeed = leftDistance / duration,
-                LeftDistance = leftDistance,
+                Duration = Math.Round(duration, 4),
+                LeftAvgSpeed = Math.Round(leftDistance / duration,4),
+                LeftDistance = Math.Round(leftDistance, 4),
                 LeftDirection = "right",
-                RightAvgSpeed = -rightDistance / duration,
-                RightDistance = rightDistance,
+                RightAvgSpeed = Math.Round(-rightDistance / duration, 4),
+                RightDistance = Math.Round(rightDistance, 4),
                 RightDirection = "left"
             };
         }
@@ -199,8 +232,9 @@ namespace Core.Physics
         {
             for (double t = 0; t < 1000; t += step)
             {
-                double l = leftStart + left.Eval(t);
-                double r = rightStart + right.Eval(t);
+                double l = left.Eval(t);
+                double r = right.Eval(t);
+
                 if (r - l <= carWidth)
                     return t;
             }
