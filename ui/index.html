@@ -38,6 +38,7 @@
                 type="text"
                 placeholder="Например: 2*t + 0.2*t*t"
                 autocomplete="off"
+                value="2*t + 0.2*t*t"
             >
 
         </div>
@@ -56,6 +57,7 @@
                 type="text"
                 placeholder="Например: 10 - 3*t"
                 autocomplete="off"
+                value="10 - 3*t"
             >
 
 
@@ -85,6 +87,36 @@
                 Повышенная (шаг ~5 мс)
             </option>
         </select>
+        <div class="row">
+
+    <label for="animation-speed">
+        Скорость воспроизведения:
+    </label>
+
+    <select id="animation-speed">
+        
+        <option value="500">
+            Очень медленная
+        </option>
+
+        <option value="200" selected>
+            Медленная
+        </option>        
+        
+        <option value="100" selected>
+            Обычная
+        </option>
+
+        <option value="50">
+            Быстрая
+        </option>
+
+        <option value="10">
+            Очень быстрая
+        </option>
+    </select>
+
+</div>
 
     </div>
 
@@ -104,9 +136,54 @@
         >
             Старт
         </button>
+    </div>
 
+    <p id="message"></p>
+    <div id="statistics">
+        <h3>Результаты симуляции</h3>
+        <p id="collision-time">Время столкновения: —</p>
+        <p id="left-statistics">Левая машина: —</p>
+        <p id="right-statistics">Правая машина: —</p>
+    </div>
+
+
+    <div id="timeline-controls">
+        <button id="play-pause-button" type="button" disabled>
+            Пауза
+        </button>
+        <input
+            id="timeline-seek"
+            type="range"
+            min="0"
+            max="1000"
+            value="0"
+            step="1"
+            disabled
+            aria-label="Перемотка симуляции"
+        >
+        <span id="timeline-current-time">0.00 с</span>
+        <span>/</span>
+        <span id="timeline-total-time">0.00 с</span>
+    </div>
+
+
+
+
+    <div id="scene"></div>
+    
+    <div id="graph">
+        <h3>График движения машин</h3>
+        <div id="position-graph"></div>
     </div>
 
 </section>
+<script src="js/validators.js"></script>
+<script src="js/scene.js"></script>
+<script src="js/statistics.js"></script>
+<script src="js/graph.js"></script>
+<script src="js/timeline.js"></script>
+<script src="js/api.js"></script>
+<script src="js/app.js"></script>
+
 </body>
 </html>
