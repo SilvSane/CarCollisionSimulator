@@ -57,9 +57,7 @@ namespace Core.Physics
         {
             if (input.Dt <= 0) throw new Exception("Шаг времени больше нуля надо");
             if (input.CarWidth <= 0) throw new Exception("Ширина машины больше нуля надо");
-            if (input.LeftStart <= 0) throw new Exception("Левая машина должна быть левее правой");
-            if (string.IsNullOrWhiteSpace(input.LeftEquation) || string.IsNullOrWhiteSpace(input.RightEquation)) throw new Exception("Уравнение не пустое должно быть"); 
-
+            if (string.IsNullOrWhiteSpace(input.LeftEquation) || string.IsNullOrWhiteSpace(input.RightEquation)) throw new Exception("Уравнение не пустое должно быть");
         }
 
         //Проверка уравнений  
