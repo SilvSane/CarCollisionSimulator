@@ -22,4 +22,17 @@ app.UseStaticFiles(new StaticFileOptions { FileProvider = fileProvider });
 
 app.MapControllers();
 
+// Автоматическое открытие браузера при старте
+if (app.Environment.IsDevelopment())
+{
+    app.Lifetime.ApplicationStarted.Register(() =>
+    {
+        System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
+        {
+            FileName = "http://localhost:5000",
+            UseShellExecute = true
+        });
+    });
+}
+
 app.Run();
