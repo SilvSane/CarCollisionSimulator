@@ -136,6 +136,23 @@
         >
             Старт
         </button>
+
+        <div class="row">
+            <button id="export-btn" type="button" disabled>
+                Экспорт CSV
+            </button>
+
+            <label for="import-file">
+                Импорт CSV:
+            </label>
+
+            <input
+                id="import-file"
+                type="file"
+                accept=".csv"
+            >
+        </div>
+
     </div>
 
     <p id="message"></p>
@@ -175,6 +192,7 @@
         <h3>График движения машин</h3>
         <div id="position-graph"></div>
     </div>
+    
 
 </section>
 <script src="js/validators.js"></script>

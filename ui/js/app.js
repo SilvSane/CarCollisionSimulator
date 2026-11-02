@@ -90,6 +90,8 @@ el.startButton.addEventListener("click", async function () {
     
     showStatistics(result.statistics);
 
+    document.getElementById("export-btn").disabled = false;
+
     animateScene(result.samples, result.meta.dt, Number(el.animationSpeed.value));
     drawPositionGraph(result.samples);
 
@@ -101,3 +103,171 @@ el.startButton.addEventListener("click", async function () {
 
 updateCheckButtonState();
 initScene();
+
+// ==========================================
+// ЭКСПОРТ РЕЗУЛЬТАТОВ В CSV
+// ==========================================
+
+document.getElementById("export-btn").addEventListener("click", function () {
+  if (!animationSamples || animationSamples.length === 0) {
+    return;
+  }
+
+  let csvContent = "\uFEFF";
+  csvContent += "Time,LeftCar,RightCar\n";
+
+  for (let i = 0; i < animationSamples.length; i++) {
+    const sample = animationSamples[i];
+
+    csvContent +=
+      `${sample.t},${sample.left},${sample.right}\n`;
+  }
+
+  const blob = new Blob(
+    [csvContent],
+    { type: "text/csv;charset=utf-8;" }
+  );
+
+  const url = URL.createObjectURL(blob);
+
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = "simulation_results.csv";
+
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+
+  URL.revokeObjectURL(url);
+});
+
+
+
+document.getElementById("import-file").addEventListener(
+  "change",
+  function (event) {
+
+    const file = event.target.files[0];
+
+    if (!file) {
+      return;
+    }
+
+    const reader = new FileReader();
+
+    reader.onload = function (e) {
+
+      const text = e.target.result;
+      const lines = text.split(/\r?\n/);
+
+      const newSamples = [];
+
+
+      for (let i = 1; i < lines.length; i++) {
+
+        const line = lines[i].trim();
+
+        if (!line) {
+          continue;
+        }
+
+        const parts = line.split(",");
+
+        if (parts.length !== 3) {
+          continue;
+        }
+
+        const t = Number(parts[0]);
+        const left = Number(parts[1]);
+        const right = Number(parts[2]);
+
+        if (
+          !Number.isFinite(t) ||
+          !Number.isFinite(left) ||
+          !Number.isFinite(right)
+        ) {
+          continue;
+        }
+
+        newSamples.push({
+          t: t,
+          left: left,
+          right: right
+        });
+      }
+
+      if (newSamples.length === 0) {
+        el.message.textContent =
+          "Ошибка: в файле нет подходящих данных.";
+        return;
+      }
+
+      newSamples.sort((a, b) => a.t - b.t);
+
+
+      stopAnimationTimer();
+
+
+      animationSamples = newSamples;
+      animationIndex = 0;
+      animationPlaying = false;
+
+      animationStartTime = newSamples[0].t;
+
+      animationDuration =
+        newSamples[newSamples.length - 1].t -
+        animationStartTime;
+
+
+      const allPositions = newSamples.flatMap(sample => [
+        sample.left,
+        sample.right
+      ]);
+
+      const minPosition = Math.min(...allPositions);
+      const maxPosition = Math.max(...allPositions);
+
+      const padding =
+        Math.max((maxPosition - minPosition) * 0.1, 2);
+
+      sceneSketch.setWorldBounds(
+        minPosition - padding,
+        maxPosition + padding
+      );
+
+
+      updateScene(newSamples[0]);
+
+
+      drawPositionGraph(newSamples);
+
+      initTimeline();
+
+      configureTimeline(
+        animationDuration,
+        seekAnimation,
+        toggleAnimationPlayback
+      );
+
+      updateTimeline(
+        0,
+        animationDuration,
+        false
+      );
+
+      document.getElementById("export-btn").disabled = false;
+
+      el.message.textContent =
+        "Данные успешно загружены из файла!";
+    };
+
+    reader.onerror = function () {
+      el.message.textContent =
+        "Ошибка при чтении файла.";
+    };
+
+    reader.readAsText(file);
+
+    event.target.value = "";
+  }
+);
