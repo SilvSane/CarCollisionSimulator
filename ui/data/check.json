@@ -1,0 +1,11 @@
+{
+    "isValid": true,
+    "directions": {
+        "left": "right",
+        "right": "left"
+    },
+    "willCollide": true,
+    "predictedCollisionTime": 1.6863,
+    "errors": []
+}    
+              

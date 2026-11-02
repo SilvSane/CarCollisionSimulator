@@ -1,0 +1,4 @@
+
+input[type="text"].invalid {
+    border-color: red;
+}
