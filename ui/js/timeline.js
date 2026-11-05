@@ -1,4 +1,3 @@
-
 let timelineOnSeek = null;
 let timelineOnPlayPause = null;
 
@@ -16,7 +15,7 @@ function initTimeline() {
   seek.value = "0";
   seek.disabled = true;
   playPauseButton.disabled = true;
-  playPauseButton.textContent = "Продолжить";
+  playPauseButton.textContent = "▶";
 
   currentTime.textContent = "0.00 с";
   totalTime.textContent = "0.00 с";
@@ -51,7 +50,7 @@ function configureTimeline(duration, onSeek, onPlayPause) {
   seek.disabled = false;
 
   playPauseButton.disabled = false;
-  playPauseButton.textContent = "Пауза";
+  playPauseButton.textContent = "⏸";
   totalTime.textContent = `${duration.toFixed(2)} с`;
 }
 
@@ -62,9 +61,8 @@ function updateTimeline(current, duration, playing) {
 
   if (!seek || !playPauseButton || !currentTime) return;
 
-  const percent = duration > 0
-    ? Math.max(0, Math.min(100, current / duration * 100))
-    : 0;
+  const percent =
+    duration > 0 ? Math.max(0, Math.min(100, (current / duration) * 100)) : 0;
 
   currentTime.textContent = `${current.toFixed(2)} с`;
 
@@ -72,5 +70,5 @@ function updateTimeline(current, duration, playing) {
     seek.value = String(Math.round(percent * 10));
   }
 
-  playPauseButton.textContent = playing ? "Пауза" : "Продолжить";
+  playPauseButton.textContent = playing ? "⏸" : "▶";
 }

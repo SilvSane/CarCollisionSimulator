@@ -1,189 +1,127 @@
 <!DOCTYPE html>
-
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-
-
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Симулятор встречного движения</title>
-<link rel="stylesheet" href="css/style.css">
-<script src="https://cdn.jsdelivr.net/npm/p5@1.9.0/lib/p5.min.js"></script>
-<script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
-
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Симулятор встречного движения</title>
+    <link rel="stylesheet" href="css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/p5@1.9.0/lib/p5.min.js"></script>
+    <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
 </head>
-
 <body>
 
+    <header>
+        <h1>Симулятор встречного движения</h1>
+    </header>
 
-<h1>Симулятор встречного движения</h1>
+    <main class="main-layout">
+        
+        <div class="left-panel">
+            <section class="panel">
+                <h2>Параметры</h2>
 
+                <div class="form-group">
+                    <label for="left-equation">Уравнение левой машины</label>
+                    <input id="left-equation" type="text" placeholder="Например: 2*t + 0.2*t*t" autocomplete="off" value="2*t + 0.2*t*t" oninput="this.value = this.value.replace(/[^0-9t+\-*/(). ]/gi, '')">
+                </div>
 
-<section class="panel">
-    <h2>Параметры</h2>
+                <div class="form-group">
+                    <label for="right-equation">Уравнение правой машины</label>
+                    <input id="right-equation" type="text" placeholder="Например: 10 - 3*t" autocomplete="off" value="10 - 3*t" oninput="this.value = this.value.replace(/[^0-9t+\-*/(). ]/gi, '')">
+                </div>
 
-    <div class="row">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="dt-select">Точность:</label>
+                        <select id="dt-select">
+                            <!-- Сократили текст, чтобы точно влезало -->
+                            <option value="1.0">Ориентировочная (~1с)</option>
+                            <option value="0.05" selected>Стандартная (~50мс)</option>
+                            <option value="0.005">Повышенная (~5мс)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="animation-speed">Скорость:</label>
+                        <select id="animation-speed">
+                            <option value="500">Очень медленная</option>
+                            <option value="200">Медленная</option>        
+                            <option value="100" selected>Обычная</option>
+                            <option value="50">Быстрая</option>
+                            <option value="10">Очень быстрая</option>
+                        </select>
+                    </div>
+                </div>
 
-        <div class="col">
+                <div class="actions">
+                    <button id="check-button" disabled>Проверить</button>
+                    <button id="start-button" disabled class="btn-primary">Старт</button>
+                </div>
 
-            <label
-                for="left-equation"
-            >
-                Уравнение левой машины
-            </label>
+                <div id="message-container">
+                    <p id="message"></p>
+                </div>
 
-            <input
-                id="left-equation"
-                type="text"
-                placeholder="Например: 2*t + 0.2*t*t"
-                autocomplete="off"
-                value="2*t + 0.2*t*t"
-            >
+                <div class="actions secondary-actions">
+                    <button id="export-btn" type="button" disabled class="btn-secondary">Экспорт CSV</button>
+                    <div class="file-upload-wrapper">
+                        <label for="import-file" class="btn-secondary">Импорт CSV</label>
+                        <input id="import-file" type="file" accept=".csv">
+                    </div>
+                </div>
+            </section>
 
+            <section class="panel" id="statistics">
+                <h2>Результаты</h2>
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <span class="stat-label">Время столкновения:</span>
+                        <!-- ТУТ ПУСТО, JS САМ ВСТАВИТ ЦИФРУ -->
+                        <span id="collision-time" class="stat-value empty">—</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Левая машина:</span>
+                        <span id="left-statistics" class="stat-value empty">—</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Правая машина:</span>
+                        <span id="right-statistics" class="stat-value empty">—</span>
+                    </div>
+                </div>
+            </section>
         </div>
 
+        <div class="right-panel">
+            <section class="panel viz-panel">
+                <div id="scene-wrapper">
+                    <div id="scene"></div>
+                </div>
+                
+                <div id="graph">
+                    <h2>График движения машин</h2>
+                    <div id="position-graph"></div>
+                </div>
 
-        <div class="col">
-
-            <label
-                for="right-equation"
-            >
-                Уравнение правой машины
-            </label>
-
-            <input
-                id="right-equation"
-                type="text"
-                placeholder="Например: 10 - 3*t"
-                autocomplete="off"
-                value="10 - 3*t"
-            >
-
-
+                <div class="timeline-panel">
+                    <div id="timeline-controls">
+                        <button id="play-pause-button" type="button" disabled class="btn-icon">▶</button>
+                        <input id="timeline-seek" type="range" min="0" max="1000" value="0" step="1" disabled>
+                        <div class="time-display">
+                            <span id="timeline-current-time">0.00 с</span> / <span id="timeline-total-time">0.00 с</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
         </div>
 
-    </div>
+    </main>
 
-
-    <div class="row">
-
-        <label
-            for="dt-select"
-        >
-            Точность:
-        </label>
-
-        <select id="dt-select">
-            <option value="1.0">
-                Ориентировочная (шаг ~1 с)
-            </option>
-
-            <option value="0.05" selected>
-                Стандартная (шаг ~50 мс)
-            </option>
-
-            <option value="0.005">
-                Повышенная (шаг ~5 мс)
-            </option>
-        </select>
-        <div class="row">
-
-    <label for="animation-speed">
-        Скорость воспроизведения:
-    </label>
-
-    <select id="animation-speed">
-        
-        <option value="500">
-            Очень медленная
-        </option>
-
-        <option value="200" selected>
-            Медленная
-        </option>        
-        
-        <option value="100" selected>
-            Обычная
-        </option>
-
-        <option value="50">
-            Быстрая
-        </option>
-
-        <option value="10">
-            Очень быстрая
-        </option>
-    </select>
-
-</div>
-
-    </div>
-
-
-    <div class="row">
-
-        <button
-            id="check-button"
-            disabled
-        >
-            Проверить уравнения
-        </button>
-
-        <button
-            id="start-button"
-            disabled
-        >
-            Старт
-        </button>
-    </div>
-
-    <p id="message"></p>
-    <div id="statistics">
-        <h3>Результаты симуляции</h3>
-        <p id="collision-time">Время столкновения: —</p>
-        <p id="left-statistics">Левая машина: —</p>
-        <p id="right-statistics">Правая машина: —</p>
-    </div>
-
-
-    <div id="timeline-controls">
-        <button id="play-pause-button" type="button" disabled>
-            Пауза
-        </button>
-        <input
-            id="timeline-seek"
-            type="range"
-            min="0"
-            max="1000"
-            value="0"
-            step="1"
-            disabled
-            aria-label="Перемотка симуляции"
-        >
-        <span id="timeline-current-time">0.00 с</span>
-        <span>/</span>
-        <span id="timeline-total-time">0.00 с</span>
-    </div>
-
-
-
-
-    <div id="scene"></div>
-    
-    <div id="graph">
-        <h3>График движения машин</h3>
-        <div id="position-graph"></div>
-    </div>
-
-</section>
-<script src="js/validators.js"></script>
-<script src="js/scene.js"></script>
-<script src="js/statistics.js"></script>
-<script src="js/graph.js"></script>
-<script src="js/timeline.js"></script>
-<script src="js/api.js"></script>
-<script src="js/app.js"></script>
-
+    <script src="js/validators.js"></script>
+    <script src="js/effect.js"></script>
+    <script src="js/scene.js"></script>
+    <script src="js/statistics.js"></script>
+    <script src="js/graph.js"></script>
+    <script src="js/timeline.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/app.js"></script>
 </body>
 </html>
