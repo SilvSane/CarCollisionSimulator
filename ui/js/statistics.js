@@ -5,24 +5,22 @@ function showStatistics(statistics) {
   const leftStatistics = document.getElementById("left-statistics");
   const rightStatistics = document.getElementById("right-statistics");
 
-  collisionTime.textContent =
-    `Время столкновения: ${
+  if (collisionTime) {
+    collisionTime.textContent =
       statistics.collisionTime != null
-        ? Number(statistics.collisionTime).toFixed(2)
-        : "—"
-    } с`;
+        ? `${Number(statistics.collisionTime).toFixed(2)} с`
+        : "—";
+    collisionTime.classList.remove("empty");
+  }
 
-  leftStatistics.textContent =
-    `Левая машина: средняя скорость ${
-      Number(statistics.left.averageSpeed).toFixed(2)
-    } м/с, расстояние ${
-      Number(statistics.left.distance).toFixed(2)
-    } м`;
+  if (leftStatistics) {
+    // Возвращаем понятные подписи для цифр
+    leftStatistics.innerHTML = `Скорость: ${Number(statistics.left.averageSpeed).toFixed(2)} м/с<br>Расстояние: ${Number(statistics.left.distance).toFixed(2)} м`;
+    leftStatistics.classList.remove("empty");
+  }
 
-  rightStatistics.textContent =
-    `Правая машина: средняя скорость ${
-      Number(statistics.right.averageSpeed).toFixed(2)
-    } м/с, расстояние ${
-      Number(statistics.right.distance).toFixed(2)
-    } м`;
+  if (rightStatistics) {
+    rightStatistics.innerHTML = `Скорость: ${Number(statistics.right.averageSpeed).toFixed(2)} м/с<br>Расстояние: ${Number(statistics.right.distance).toFixed(2)} м`;
+    rightStatistics.classList.remove("empty");
+  }
 }
