@@ -10,29 +10,29 @@ var app = builder.Build();
 
 app.UseCors();
 
-// путь к папке UI
-var uiPath = Path.Combine(builder.Environment.ContentRootPath, "..", "UI");
-var fileProvider = new PhysicalFileProvider(uiPath);
+var assembly = typeof(Program).Assembly;
+var embeddedProvider = new ManifestEmbeddedFileProvider(assembly, "UI");
 
-// localhost:5000 - открытие index.html
-app.UseDefaultFiles(new DefaultFilesOptions { FileProvider = fileProvider });
+app.UseDefaultFiles(new DefaultFilesOptions { FileProvider = embeddedProvider });
 
-// раздача статики
-app.UseStaticFiles(new StaticFileOptions { FileProvider = fileProvider });
+app.UseStaticFiles(new StaticFileOptions { FileProvider = embeddedProvider });
+
 
 app.MapControllers();
 
-// Автоматическое открытие браузера при старте
-if (app.Environment.IsDevelopment())
+app.Lifetime.ApplicationStarted.Register(() =>
 {
-    app.Lifetime.ApplicationStarted.Register(() =>
+    try
     {
         System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
         {
             FileName = "http://localhost:5000",
             UseShellExecute = true
         });
-    });
-}
+    }
+    catch
+    {
+    }
+});
 
 app.Run();

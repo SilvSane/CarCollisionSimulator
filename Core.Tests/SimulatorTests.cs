@@ -30,7 +30,7 @@ namespace Core.Tests
 
             Assert.True(result.IsValid);
             Assert.True(result.WillCollide);
-            Assert.Equal(1.8, result.PredictedCollisionTime.Value, 2);
+            Assert.Equal(1.8, result.PredictedCollisionTime!.Value, 2);
         }
         [Fact]
         public void Check_ShouldReject_WhenCarsMoveInSameDirection()
