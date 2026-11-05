@@ -83,6 +83,12 @@ function initScene(containerId = "scene") {
         "Red",
         carWidthPx
       );
+            drawCollisionEffect(
+        p,
+        worldToScreen((leftPosition + rightPosition) / 2),
+        roadYpx - 15,
+        carWidthPx
+      );
     }};
 
 
@@ -126,6 +132,12 @@ function updateScene(sample) {
   if (!sceneSketch || !sample) return;
 
   sceneSketch.setCarPositions(sample.left, sample.right);
+
+const lastSample = animationSamples[animationSamples.length - 1];
+
+setCollisionEffectActive(
+    Boolean(lastSample) && sample.t >= lastSample.t - 1e-6
+);
 }
 
 function renderAnimationFrame(index) {
